@@ -29,7 +29,6 @@ const gameState = {
   poison: [-1, -1, 0], // x, y, radius
   players: [], // store the player objects
   playerMap: new Map(), // guid -> player object
-  playerNameMap: new Map(), // playerName -> playerObject
   playerStateToPlayerMap: new Map(), // playerStateGuid -> playerGuid
   playerStateMap: new Map(), // playerStateGuid -> playerStateObj
   showingPlayers: new Map(), // guid -> player object
@@ -43,7 +42,6 @@ const gameState = {
   DIGChildrenMap: new Map(), // droppedItemGroupGuid -> [...ItemInteractionGuid]
   IItoIMap: new Map(), // itemInteractionId -> itemGuid
 
-  teamMembers: new Set(), // store my team member names
 
   isDesert: false,
 
@@ -108,7 +106,6 @@ const gameState = {
       teamMembers: [...this.teamMembers.entries()],
       playerStateToPlayerMap: [...this.playerStateToPlayerMap.entries()],
       playerStateMap: [...this.playerStateMap.entries()],
-      playerNameMap: [...this.playerNameMap.entries()],
       playerMap: [...this.playerMap.entries()],
       apawnsMap: [...this.apawnsMap.entries()],
       itemMap: [...this.itemMap.entries()],
@@ -226,32 +223,6 @@ const gameState = {
     //this.resetGameState()
     this.playbackState = 'Paused'
     logger.warn('Playback Stopped')
-  },
-
-  // find the playerState
-  _updatePlayerObjectData (playerObj, playerStateObj, playerGuid) {
-    if (playerStateObj.numKills) {
-      playerObj.kills = playerStateObj.numKills
-    }
-    if (playerStateObj.ranking) {
-      playerObj.ranking = playerStateObj.ranking
-      if (!playerObj.dead) { // make it dead
-        playerObj.dead = true
-        logger.info({ guid: playerGuid, obj: playerObj }, 'Player is dead')
-        this.showingPlayers.delete(playerGuid)
-      }
-    }
-    if (playerStateObj.teamNumber) {
-      playerObj.team = playerStateObj.teamNumber
-    }
-    if (playerStateObj.playerName) {
-      playerObj.name = playerStateObj.playerName
-      this.playerNameMap.set(playerStateObj.playerName, playerObj)
-      if (this.teamMembers.has(playerObj.name) && !playerObj.friend) {
-        playerObj.friend = true
-        logger.warn({ playerName: playerObj.name }, 'Player is friend because of his name')
-      }
-    }
   },
 
   processPUBGEvent (event) {
